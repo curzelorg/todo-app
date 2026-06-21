@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Modern Todo List Application with Local Storage">
+    <meta name="theme-color" content="#3b82f6">
+    <title>📝 Todo List App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">📝 Todo List</h1>
+                <div class="header-actions">
+                    <button class="btn-icon theme-toggle" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+                        🌙
+                    </button>
+                    <button class="btn-icon settings-btn" title="Settings" aria-label="Settings">
+                        ⚙️
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="todoInput" 
+                        class="todo-input" 
+                        placeholder="Add a new task..." 
+                        autocomplete="off"
+                    >
+                    <button class="btn btn-primary add-todo-btn" id="addBtn">
+                        ➕ Add
+                    </button>
+                </div>
+
+                <!-- Quick Add Options -->
+                <div class="quick-options">
+                    <select id="categorySelect" class="select-input">
+                        <option value="">Category</option>
+                        <option value="work">🏢 Work</option>
+                        <option value="personal">👤 Personal</option>
+                        <option value="shopping">🛒 Shopping</option>
+                        <option value="health">🏥 Health</option>
+                        <option value="finance">💰 Finance</option>
+                    </select>
+
+                    <select id="prioritySelect" class="select-input">
+                        <option value="medium">Priority</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+
+                    <input 
+                        type="date" 
+                        id="dueDateInput" 
+                        class="date-input"
+                    >
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="stat-card">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Completed</span>
+                    <span class="stat-value" id="completedCount">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Active</span>
+                    <span class="stat-value" id="activeCount">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Progress</span>
+                    <span class="stat-value" id="progressPercent">0%</span>
+                </div>
+            </section>
+
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <div class="filter-group">
+                    <label for="statusFilter">Status:</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="all">All</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="categoryFilter">Category:</label>
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="health">Health</option>
+                        <option value="finance">Finance</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="priorityFilter">Priority:</label>
+                    <select id="priorityFilter" class="filter-select">
+                        <option value="">All Priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortBy">Sort:</label>
+                    <select id="sortBy" class="filter-select">
+                        <option value="dueDate">Due Date</option>
+                        <option value="priority">Priority</option>
+                        <option value="created">Newest</option>
+                        <option value="title">Alphabetical</option>
+                    </select>
+                </div>
+
+                <div class="filter-group search-group">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Search todos..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <button class="btn btn-secondary reset-filters" id="resetBtn">
+                    🔄 Reset
+                </button>
+            </section>
+
+            <!-- Todos List -->
+            <section class="todos-section">
+                <div id="todosList" class="todos-list">
+                    <!-- Todos will be rendered here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-icon">📭</div>
+                    <h3>No todos yet!</h3>
+                    <p>Create your first task to get started</p>
+                </div>
+
+                <!-- No Results State -->
+                <div id="noResultsState" class="empty-state" style="display: none;">
+                    <div class="empty-icon">🔍</div>
+                    <h3>No results found</h3>
+                    <p>Try adjusting your filters or search term</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="modal-close" aria-label="Close">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Theme Setting -->
+                    <div class="setting-group">
+                        <label>
+                            <input type="checkbox" id="darkModeSetting">
+                            Dark Mode
+                        </label>
+                    </div>
+
+                    <!-- Default Priority -->
+                    <div class="setting-group">
+                        <label for="defaultPriority">Default Priority:</label>
+                        <select id="defaultPriority" class="select-input">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+
+                    <!-- Export/Import -->
+                    <div class="setting-group">
+                        <h3>Data Management</h3>
+                        <button class="btn btn-secondary" id="exportBtn">
+                            📥 Export as JSON
+                        </button>
+                        <button class="btn btn-secondary" id="importBtn">
+                            📤 Import from JSON
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="setting-group danger-zone">
+                        <h3>Danger Zone</h3>
+                        <button class="btn btn-danger" id="clearAllBtn">
+                            🗑️ Clear All Data
+                        </button>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="setting-group">
+                        <h3>Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Todos:</span>
+                                <span id="statTotal">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completed:</span>
+                                <span id="statCompleted">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Active:</span>
+                                <span id="statActive">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completion Rate:</span>
+                                <span id="statRate">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary modal-close-btn">Done</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div id="editModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Edit Todo</h2>
+                    <button class="modal-close" aria-label="Close">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="editTitle">Title:</label>
+                        <input type="text" id="editTitle" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDescription">Description:</label>
+                        <textarea id="editDescription" class="form-input" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCategory">Category:</label>
+                        <select id="editCategory" class="form-input">
+                            <option value="">None</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="health">Health</option>
+                            <option value="finance">Finance</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPriority">Priority:</label>
+                        <select id="editPriority" class="form-input">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editDueDate">Due Date:</label>
+                        <input type="date" id="editDueDate" class="form-input">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close-btn">Cancel</button>
+                    <button class="btn btn-primary" id="saveEditBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="storage.js"></script>
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
