@@ -1,0 +1,13 @@
+{
+  "name": "todo-list-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Vanilla-JS todo list app (localStorage). Vite is used only as the dev server.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^6.1.0"
+  }
+}
